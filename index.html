@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#b8441a">
+    <meta name="theme-color" content="#b8441a" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="manifest" href="./site.webmanifest">
+    <meta name="theme-color" content="#050508">
+    <meta name="msapplication-TileColor" content="#050508">
+    <meta name="msapplication-config" content="./browserconfig.xml">
+    <title>Напиши то, что не можешь сказать</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-size: 18px;
+      }
+    
+      html, body {
+        height: 100%;
+      }
+    
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #080403;
+        color: #f0e2d4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 24px;
+        overflow: hidden;
+        position: relative;
+      }
+    
+      /* Фон: тлеющие угли — контрастнее */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 15% 85%, rgba(255, 90, 20, 0.45), transparent 40%),
+          radial-gradient(circle at 85% 15%, rgba(255, 60, 10, 0.35), transparent 45%),
+          radial-gradient(circle at 50% 50%, rgba(140, 35, 5, 0.30), transparent 60%),
+          radial-gradient(circle at 70% 90%, rgba(255, 140, 50, 0.25), transparent 35%),
+          #080403;
+        z-index: -2;
+        animation: breathe 8s ease-in-out infinite;
+      }
+    
+      /* Мерцание поверх — заметнее */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at 50% 100%, rgba(255, 140, 50, 0.18), transparent 65%);
+        z-index: -1;
+        animation: flicker 2.5s ease-in-out infinite;
+      }
+    
+      @keyframes breathe {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.05); }
+      }
+    
+      @keyframes flicker {
+        0%, 100% { opacity: 0.5; }
+        30% { opacity: 1; }
+        50% { opacity: 0.6; }
+        70% { opacity: 0.95; }
+      }
+    
+      .container {
+        width: 100%;
+        max-width: 620px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        position: relative;
+        z-index: 1;
+      }
+    
+      .intro {
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #c4b0a0;
+        padding: 0 8px;
+      }
+    
+      .intro strong {
+        color: #f0e2d4;
+        font-weight: 600;
+      }
+    
+      .card {
+        position: relative;
+        background: rgba(35, 18, 10, 0.65);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 140, 80, 0.25);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow:
+          0 0 80px rgba(255, 90, 30, 0.15),
+          inset 0 1px 0 rgba(255, 200, 160, 0.08);
+        transition: box-shadow 0.6s, border-color 0.6s;
+      }
+    
+      /* Карточка светится при сгорании */
+      .card.burning {
+        border-color: rgba(255, 120, 40, 0.7);
+        box-shadow:
+          0 0 120px rgba(255, 100, 30, 0.5),
+          0 0 40px rgba(255, 60, 10, 0.4),
+          inset 0 1px 0 rgba(255, 200, 160, 0.15);
+      }
+    
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        background: rgba(8, 4, 3, 0.6);
+        border: 1px solid rgba(255, 140, 80, 0.2);
+        border-radius: 10px;
+        padding: 16px;
+        color: #f5ebe0;
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.6;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+    
+      textarea:focus {
+        border-color: rgba(255, 140, 80, 0.6);
+        box-shadow: 0 0 0 3px rgba(255, 100, 40, 0.15);
+      }
+    
+      textarea::placeholder {
+        color: #7a6355;
+      }
+    
+      /* Анимация сгорания: текст "раскаляется", улетает вверх и растворяется */
+      textarea.burning {
+        animation: burn 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+    
+      @keyframes burn {
+        0% {
+          opacity: 1;
+          filter: blur(0) brightness(1);
+          transform: translateY(0) scale(1);
+          color: #f5ebe0;
+        }
+        20% {
+          filter: blur(0) brightness(1.8) drop-shadow(0 0 12px rgba(255, 140, 50, 0.9));
+          color: #ffd9a8;
+        }
+        60% {
+          opacity: 0.5;
+          filter: blur(4px) brightness(1.4) drop-shadow(0 0 20px rgba(255, 100, 30, 0.7));
+          transform: translateY(-40px) scale(0.98);
+          color: #ff9a5c;
+        }
+        100% {
+          opacity: 0;
+          filter: blur(14px) brightness(0.8);
+          transform: translateY(-90px) scale(0.95);
+          color: #ff5a1c;
+        }
+      }
+    
+      /* Искры */
+      .sparks {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: visible;
+        opacity: 0;
+      }
+    
+      .sparks.active {
+        opacity: 1;
+      }
+    
+      .spark {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ffd08a, #ff5a1c 60%, transparent 70%);
+        box-shadow: 0 0 8px rgba(255, 120, 40, 0.9);
+        animation: rise 2.4s ease-out forwards;
+      }
+    
+      @keyframes rise {
+        0% {
+          opacity: 0;
+          transform: translateY(0) scale(0.5);
+        }
+        15% {
+          opacity: 1;
+          transform: translateY(-20px) scale(1.2);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-180px) scale(0.3);
+        }
+      }
+    
+      .actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+    
+      button {
+        background: linear-gradient(180deg, #d9521f, #8a2f0e);
+        border: 1px solid rgba(255, 160, 100, 0.45);
+        color: #fff0e0;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 14px 44px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.3s, opacity 0.3s;
+        box-shadow: 0 4px 24px rgba(255, 90, 30, 0.4);
+      }
+    
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 36px rgba(255, 90, 30, 0.65);
+      }
+    
+      button:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    
+      button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    
+      .outro {
+        text-align: center;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #ffd9a8;
+        opacity: 0;
+        transition: opacity 2s ease 0.3s;
+        min-height: 44px;
+        padding: 0 8px;
+        text-shadow: 0 0 20px rgba(255, 140, 50, 0.4);
+      }
+    
+      .outro.visible {
+        opacity: 1;
+      }
+    
+      .disclaimer {
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, .2);
+        padding: 0 8px;
+      }
+    
+      @media (prefers-reduced-motion: reduce) {
+        body::before, body::after { animation: none; }
+        textarea.burning { animation: burn 0.8s ease forwards; }
+        @keyframes burn {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        .spark { display: none; }
+      }
+    </style>
+  </head>
+<body>
+
+<div class="container">
+
+  <p class="intro">
+    <strong>Напиши то, что не можешь сказать.</strong><br>
+    Здесь можно высказать всё: обиду, злость, то, что не решаешься произнести вслух.
+    Ничего не отправится. Никто не прочитает. Это только твоё.
+  </p>
+
+  <div class="card">
+    <textarea
+      id="message"
+      placeholder="Пиши сюда. Без фильтров. Без цензуры. Как есть."
+      aria-label="Текст сообщения"
+    ></textarea>
+
+    <div class="actions">
+      <button id="releaseBtn" type="button">Отпустить</button>
+    </div>
+  </div>
+
+  <p class="outro" id="outro">
+    Дальше будет легче.
+  </p>
+
+  <p class="disclaimer">
+    Это не терапия и не замена психологу. Если тяжело — обратись к специалисту.
+  </p>
+
+</div>
+
+<script>
+  const textarea = document.getElementById('message');
+  const button = document.getElementById('releaseBtn');
+  const outro = document.getElementById('outro');
+
+  button.addEventListener('click', () => {
+    const text = textarea.value.trim();
+
+    if (!text) {
+      textarea.focus();
+      return;
+    }
+
+    // Запускаем анимацию "сгорания"
+    textarea.classList.add('burning');
+    button.disabled = true;
+
+    // Через 1.5 сек — очищаем и возвращаем форму
+    setTimeout(() => {
+      textarea.value = '';
+      textarea.classList.remove('burning');
+      button.disabled = false;
+      outro.classList.add('visible');
+
+      // Прячем финальную фразу через 6 секунд
+      setTimeout(() => {
+        outro.classList.remove('visible');
+      }, 6000);
+    }, 1600);
+  });
+</script>
+
+</body>
+</html>
